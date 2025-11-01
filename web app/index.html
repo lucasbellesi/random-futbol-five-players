@@ -5,229 +5,106 @@
   <title>Formar 2 equipos (5 vs 5)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    :root {
-      --dark-bg: #0f172a;
-      --dark-accent: #1f2937;
-      --light-bg: #f8fafc;
-      --light-card: #ffffff;
-      --accent: #6366f1;
-      --radius: 14px;
-      --shadow: 0 10px 25px rgba(15,23,42,.15);
-    }
-    * { box-sizing: border-box; }
     body {
+      font-family: system-ui, sans-serif;
       margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #e2e8f0 0, #cbd5f5 40%, #e2e8f0 100%);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
       padding: 1.5rem;
+      background: radial-gradient(circle at top, #e2e8f0, #cbd5f5 50%);
+      min-height: 100vh;
     }
-    header {
-      text-align: center;
-    }
-    h1 {
-      font-size: clamp(1.4rem, 2vw, 1.9rem);
-      margin-bottom: .25rem;
-    }
+    header { text-align: center; }
+    h1 { margin-bottom: .3rem; }
     .wrapper {
       display: grid;
       gap: 1.5rem;
-      grid-template-columns: minmax(280px, 360px) minmax(300px, 1fr);
-      max-width: 1200px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      max-width: 1000px;
       margin: 0 auto;
-      width: 100%;
     }
     .panel {
-      background: rgba(248, 250, 252, 0.75);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,.4);
+      background: rgba(255,255,255,0.8);
       border-radius: 1rem;
-      box-shadow: var(--shadow);
-      padding: 1rem 1.25rem 1.25rem;
-    }
-    .panel h2 {
-      font-size: 1.05rem;
-      margin-top: 0;
-      display: flex;
-      align-items: center;
-      gap: .4rem;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 5px 20px rgba(0,0,0,.1);
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: .85rem;
+      font-size: .9rem;
     }
-    th, td {
-      padding: .35rem .4rem;
-      text-align: left;
-    }
-    th {
-      font-weight: 600;
-      font-size: .7rem;
-      text-transform: uppercase;
-      letter-spacing: .03em;
-      border-bottom: 1px solid rgba(15,23,42,.1);
-    }
+    th, td { padding: .3rem; text-align: left; }
+    th { font-size: .75rem; text-transform: uppercase; opacity: .7; }
     input[type="text"], input[type="number"] {
       width: 100%;
-      border: 1px solid rgba(15,23,42,.1);
-      border-radius: .4rem;
-      padding: .25rem .35rem;
-      font-size: .75rem;
-      background: #fff;
-    }
-    input[type="number"] {
-      max-width: 4.2rem;
+      padding: .3rem;
+      border-radius: .3rem;
+      border: 1px solid #ccc;
+      font-size: .8rem;
     }
     button {
-      background: var(--accent);
+      background: #6366f1;
       color: #fff;
       border: none;
-      margin-top: .65rem;
-      padding: .55rem .8rem;
-      border-radius: .55rem;
-      font-weight: 600;
+      border-radius: .5rem;
+      padding: .6rem 1rem;
       cursor: pointer;
-      font-size: .8rem;
-      transition: transform .1s ease-out;
+      margin-top: .5rem;
+      margin-right: .35rem;
     }
-    button:active {
-      transform: translateY(1px);
-    }
-    .teams {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-      gap: 1rem;
-    }
-    .team {
-      border-radius: 1rem;
-      padding: .75rem;
-      min-height: 280px;
-      display: flex;
-      flex-direction: column;
-      gap: .5rem;
-    }
-    .team.dark {
-      background: radial-gradient(circle at top, #0f172a 0, #020617 90%);
-      color: #e2e8f0;
-    }
-    .team.light {
-      background: #f8fafc;
-      border: 1px solid rgba(15,23,42,.05);
-    }
-    .team-header {
+    #clear-storage { background: #ef4444; }
+    .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .team { border-radius: 1rem; padding: .7rem; }
+    .team.dark { background: #0f172a; color: #e2e8f0; }
+    .team.light { background: #f8fafc; border: 1px solid #ddd; }
+    .card {
+      background: rgba(255,255,255,0.1);
+      padding: .4rem .6rem;
+      border-radius: .5rem;
+      margin-bottom: .3rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .team-title {
-      font-weight: 700;
-      letter-spacing: .04em;
-      font-size: .9rem;
-      text-transform: uppercase;
-    }
-    .team-score {
-      font-size: .7rem;
-      opacity: .85;
-    }
-    .cards {
-      display: grid;
-      gap: .5rem;
-    }
-    .card {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-      border-radius: .75rem;
-      padding: .45rem .55rem;
-      background: rgba(248,250,252,.15);
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(248,250,252,.18);
-    }
-    .team.light .card {
-      background: #fff;
-      border: 1px solid rgba(15,23,42,.04);
-    }
-    .rating {
-      min-width: 2.6rem;
-      height: 2.6rem;
-      border-radius: .75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 1rem;
-    }
-    .team.dark .rating {
-      background: rgba(99, 102, 241, .4);
-    }
-    .team.light .rating {
-      background: rgba(99, 102, 241, .08);
-    }
-    .player-meta {
-      display: flex;
-      flex-direction: column;
-      gap: .05rem;
-    }
-    .player-name {
-      font-weight: 600;
-      font-size: .83rem;
-    }
-    .player-pos {
-      font-size: .68rem;
-      opacity: .7;
-    }
-    .pos-input {
-      width: 3.2rem;
-    }
-    @media (max-width: 900px) {
-      .wrapper {
-        grid-template-columns: 1fr;
-      }
+    .team.light .card { background: #fff; }
+    @media (max-width: 600px) {
+      .teams { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Armador de equipos 5 vs 5 (estilo cartas FIFA)</h1>
-    <p>Ingresá 10 jugadores con su puntaje 1–100 y generá dos equipos: camiseta oscura vs camiseta clara.</p>
+    <h1>Armador de equipos 5 vs 5</h1>
+    <p>Guarda jugadores y último equipo en localStorage.</p>
   </header>
 
   <main class="wrapper">
-    <!-- Panel de entrada -->
     <section class="panel">
       <h2>Jugadores (10)</h2>
-      <p style="font-size:.75rem;margin-top:0;">Podés cambiar los nombres y los puntajes. Después apretá “Generar equipos”.</p>
       <table id="players-table">
         <thead>
-          <tr>
-            <th>#</th>
-            <th>Nombre</th>
-            <th>Puntaje</th>
-            <th>Pos.</th>
-          </tr>
+          <tr><th>#</th><th>Nombre</th><th>Puntaje</th><th>Pos.</th></tr>
         </thead>
-        <tbody>
-          <!-- Cargamos 10 por defecto -->
-        </tbody>
+        <tbody></tbody>
       </table>
-      <button id="generate-btn">Generar equipos</button>
+      <div>
+        <button id="generate-btn">Generar equipos</button>
+        <button id="clear-storage">Borrar todo lo guardado</button>
+      </div>
+      <p style="font-size:.7rem;opacity:.7;margin-top:.5rem;">Los cambios en la tabla se guardan solos.</p>
     </section>
 
-    <!-- Panel de resultados -->
     <section class="panel">
-      <h2>Resultado</h2>
-      <div class="teams" id="teams-container">
-        <!-- Se llena por JS -->
-      </div>
+      <h2>Equipos guardados / actuales</h2>
+      <div id="teams-container"><p>No hay equipos generados.</p></div>
     </section>
   </main>
 
   <script>
-    // Datos base
+    // Claves de localStorage
+    const LS_PLAYERS_KEY = "equiposFifa_players";
+    const LS_TEAMS_KEY = "equiposFifa_lastTeams";
+
+    // Jugadores por defecto
     const defaultPlayers = [
       { name: "Messi", rating: 95, pos: "DEL" },
       { name: "Cristiano", rating: 93, pos: "DEL" },
@@ -242,27 +119,67 @@
     ];
 
     const tbody = document.querySelector("#players-table tbody");
+    const teamsContainer = document.getElementById("teams-container");
+
+    // ======== STORAGE HELPERS ========
+    function savePlayersToLS(players) {
+      localStorage.setItem(LS_PLAYERS_KEY, JSON.stringify(players));
+    }
+
+    function loadPlayersFromLS() {
+      const data = localStorage.getItem(LS_PLAYERS_KEY);
+      if (!data) return null;
+      try {
+        return JSON.parse(data);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function saveTeamsToLS(teams) {
+      localStorage.setItem(LS_TEAMS_KEY, JSON.stringify(teams));
+    }
+
+    function loadTeamsFromLS() {
+      const data = localStorage.getItem(LS_TEAMS_KEY);
+      if (!data) return null;
+      try {
+        return JSON.parse(data);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // ======== RENDERIZAR TABLA ========
     function renderTable(players) {
       tbody.innerHTML = "";
       players.forEach((p, i) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${i + 1}</td>
-          <td><input type="text" value="${p.name}" data-field="name" data-idx="${i}"></td>
-          <td><input type="number" min="1" max="100" value="${p.rating}" data-field="rating" data-idx="${i}"></td>
-          <td><input class="pos-input" type="text" value="${p.pos}" data-field="pos" data-idx="${i}"></td>
+          <td><input type="text" value="${p.name}" data-idx="${i}" data-field="name"></td>
+          <td><input type="number" value="${p.rating}" min="1" max="100" data-idx="${i}" data-field="rating"></td>
+          <td><input type="text" value="${p.pos}" data-idx="${i}" data-field="pos"></td>
         `;
         tbody.appendChild(tr);
       });
-    }
-    renderTable(defaultPlayers);
 
-    // Leer jugadores actuales desde la tabla
+      // Cada input que cambie → guardar jugadores
+      tbody.querySelectorAll("input").forEach(input => {
+        input.addEventListener("input", handlePlayerInputChange);
+      });
+    }
+
+    function handlePlayerInputChange() {
+      const players = getPlayersFromTable();
+      savePlayersToLS(players);
+    }
+
     function getPlayersFromTable() {
       const rows = tbody.querySelectorAll("tr");
       const players = [];
       rows.forEach((row, idx) => {
-        const name = row.querySelector('input[data-field="name"]').value.trim() || "Jugador " + (idx + 1);
+        const name = row.querySelector('input[data-field="name"]').value.trim() || `Jugador ${idx+1}`;
         const rating = parseInt(row.querySelector('input[data-field="rating"]').value, 10) || 1;
         const pos = row.querySelector('input[data-field="pos"]').value.trim() || "-";
         players.push({ name, rating, pos });
@@ -270,87 +187,71 @@
       return players;
     }
 
-    // Algoritmo: ordenamos por rating desc y hacemos draft 1,2,2,1,1,2,2,1,1,2
+    // ======== LÓGICA DE EQUIPOS ========
     function splitIntoTeams(players) {
-      const sorted = [...players].sort((a, b) => b.rating - a.rating);
-
-      const teamDark = [];
-      const teamLight = [];
-
-      // patrón de reparto para 10 jugadores
-      const pattern = ["dark", "light", "light", "dark", "dark", "light", "light", "dark", "dark", "light"];
-
-      sorted.forEach((player, idx) => {
-        const target = pattern[idx];
-        if (target === "dark") {
-          teamDark.push(player);
-        } else {
-          teamLight.push(player);
-        }
+      const sorted = [...players].sort((a,b) => b.rating - a.rating);
+      const pattern = ["dark","light","light","dark","dark","light","light","dark","dark","light"];
+      const dark = [];
+      const light = [];
+      sorted.forEach((p, i) => {
+        if (pattern[i] === "dark") dark.push(p);
+        else light.push(p);
       });
-
-      return { teamDark, teamLight };
+      return { dark, light };
     }
 
-    function teamTotal(team) {
-      return team.reduce((sum, p) => sum + p.rating, 0);
-    }
-
-    function renderTeams({ teamDark, teamLight }) {
-      const container = document.getElementById("teams-container");
-      container.innerHTML = "";
-
-      const darkTotal = teamTotal(teamDark);
-      const lightTotal = teamTotal(teamLight);
-
-      const darkEl = document.createElement("div");
-      darkEl.className = "team dark";
-      darkEl.innerHTML = `
-        <div class="team-header">
-          <div class="team-title">Camiseta oscura</div>
-          <div class="team-score">Total: ${darkTotal}</div>
-        </div>
-        <div class="cards">
-          ${teamDark.map(p => `
-            <div class="card">
-              <div class="rating">${p.rating}</div>
-              <div class="player-meta">
-                <span class="player-name">${p.name}</span>
-                <span class="player-pos">${p.pos}</span>
+    function renderTeams(teams) {
+      if (!teams || !teams.dark || !teams.light) {
+        teamsContainer.innerHTML = "<p>No hay equipos generados.</p>";
+        return;
+      }
+      teamsContainer.innerHTML = `
+        <div class="teams">
+          <div class="team dark">
+            <h3>Camiseta Oscura</h3>
+            ${teams.dark.map(p => `
+              <div class="card">
+                <span>${p.name} (${p.pos})</span>
+                <strong>${p.rating}</strong>
               </div>
-            </div>
-          `).join("")}
+            `).join("")}
+          </div>
+          <div class="team light">
+            <h3>Camiseta Clara</h3>
+            ${teams.light.map(p => `
+              <div class="card">
+                <span>${p.name} (${p.pos})</span>
+                <strong>${p.rating}</strong>
+              </div>
+            `).join("")}
+          </div>
         </div>
       `;
-      container.appendChild(darkEl);
-
-      const lightEl = document.createElement("div");
-      lightEl.className = "team light";
-      lightEl.innerHTML = `
-        <div class="team-header">
-          <div class="team-title">Camiseta clara</div>
-          <div class="team-score">Total: ${lightTotal}</div>
-        </div>
-        <div class="cards">
-          ${teamLight.map(p => `
-            <div class="card">
-              <div class="rating">${p.rating}</div>
-              <div class="player-meta">
-                <span class="player-name">${p.name}</span>
-                <span class="player-pos">${p.pos}</span>
-              </div>
-            </div>
-          `).join("")}
-        </div>
-      `;
-      container.appendChild(lightEl);
     }
 
-    // Primera renderización
-    const initialTeams = splitIntoTeams(defaultPlayers);
-    renderTeams(initialTeams);
+    // ======== INICIALIZACIÓN ========
+    function init() {
+      // 1. Intentar cargar jugadores guardados
+      const storedPlayers = loadPlayersFromLS();
+      if (storedPlayers && Array.isArray(storedPlayers) && storedPlayers.length === 10) {
+        renderTable(storedPlayers);
+      } else {
+        // si no hay, usar los default
+        renderTable(defaultPlayers);
+        // y guardarlos para la próxima
+        savePlayersToLS(defaultPlayers);
+      }
 
-    // Handler de botón
+      // 2. Intentar cargar equipos guardados
+      const storedTeams = loadTeamsFromLS();
+      if (storedTeams) {
+        renderTeams(storedTeams);
+      }
+    }
+
+    init();
+
+    // ======== EVENTOS DE BOTONES ========
     document.getElementById("generate-btn").addEventListener("click", () => {
       const players = getPlayersFromTable();
       if (players.length !== 10) {
@@ -359,6 +260,16 @@
       }
       const teams = splitIntoTeams(players);
       renderTeams(teams);
+      saveTeamsToLS(teams);
+      // también actualizamos la lista de jugadores (por si alguno estaba sin guardar)
+      savePlayersToLS(players);
+    });
+
+    document.getElementById("clear-storage").addEventListener("click", () => {
+      localStorage.removeItem(LS_PLAYERS_KEY);
+      localStorage.removeItem(LS_TEAMS_KEY);
+      renderTable(defaultPlayers);
+      renderTeams(null);
     });
   </script>
 </body>
