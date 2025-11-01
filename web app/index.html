@@ -4,72 +4,8 @@
   <meta charset="UTF-8" />
   <title>Formar 2 equipos (5 vs 5)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    body {
-      font-family: system-ui, sans-serif;
-      margin: 0;
-      padding: 1.5rem;
-      background: radial-gradient(circle at top, #e2e8f0, #cbd5f5 50%);
-      min-height: 100vh;
-    }
-    header { text-align: center; }
-    h1 { margin-bottom: .3rem; }
-    .wrapper {
-      display: grid;
-      gap: 1.5rem;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    .panel {
-      background: rgba(255,255,255,0.8);
-      border-radius: 1rem;
-      padding: 1rem 1.25rem;
-      box-shadow: 0 5px 20px rgba(0,0,0,.1);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .9rem;
-    }
-    th, td { padding: .3rem; text-align: left; }
-    th { font-size: .75rem; text-transform: uppercase; opacity: .7; }
-    input[type="text"], input[type="number"] {
-      width: 100%;
-      padding: .3rem;
-      border-radius: .3rem;
-      border: 1px solid #ccc;
-      font-size: .8rem;
-    }
-    button {
-      background: #6366f1;
-      color: #fff;
-      border: none;
-      border-radius: .5rem;
-      padding: .6rem 1rem;
-      cursor: pointer;
-      margin-top: .5rem;
-      margin-right: .35rem;
-    }
-    #clear-storage { background: #ef4444; }
-    .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .team { border-radius: 1rem; padding: .7rem; }
-    .team.dark { background: #0f172a; color: #e2e8f0; }
-    .team.light { background: #f8fafc; border: 1px solid #ddd; }
-    .card {
-      background: rgba(255,255,255,0.1);
-      padding: .4rem .6rem;
-      border-radius: .5rem;
-      margin-bottom: .3rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .team.light .card { background: #fff; }
-    @media (max-width: 600px) {
-      .teams { grid-template-columns: 1fr; }
-    }
-  </style>
+  <meta name="description" content="Arma equipos 5 vs 5 y guarda jugadores en localStorage." />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
@@ -79,16 +15,21 @@
 
   <main class="wrapper">
     <section class="panel">
-      <h2>Jugadores (10)</h2>
+    <h2 id="players-heading">Jugadores (10)</h2>
       <table id="players-table">
         <thead>
-          <tr><th>#</th><th>Nombre</th><th>Puntaje</th><th>Pos.</th></tr>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Puntaje</th>
+            <th scope="col">Pos.</th>
+          </tr>
         </thead>
         <tbody></tbody>
       </table>
       <div>
-        <button id="generate-btn">Generar equipos</button>
-        <button id="clear-storage">Borrar todo lo guardado</button>
+        <button id="generate-btn" type="button">Generar equipos</button>
+        <button id="clear-storage" type="button">Borrar todo lo guardado</button>
       </div>
       <p style="font-size:.7rem;opacity:.7;margin-top:.5rem;">Los cambios en la tabla se guardan solos.</p>
     </section>
@@ -99,178 +40,6 @@
     </section>
   </main>
 
-  <script>
-    // Claves de localStorage
-    const LS_PLAYERS_KEY = "equiposFifa_players";
-    const LS_TEAMS_KEY = "equiposFifa_lastTeams";
-
-    // Jugadores por defecto
-    const defaultPlayers = [
-      { name: "Messi", rating: 95, pos: "DEL" },
-      { name: "Cristiano", rating: 93, pos: "DEL" },
-      { name: "De Bruyne", rating: 91, pos: "MC" },
-      { name: "Mbappé", rating: 92, pos: "DEL" },
-      { name: "Van Dijk", rating: 90, pos: "DFC" },
-      { name: "Modric", rating: 89, pos: "MC" },
-      { name: "Haaland", rating: 91, pos: "DEL" },
-      { name: "Alisson", rating: 88, pos: "ARQ" },
-      { name: "Rodri", rating: 90, pos: "MC" },
-      { name: "Valverde", rating: 86, pos: "MC" },
-    ];
-
-    const tbody = document.querySelector("#players-table tbody");
-    const teamsContainer = document.getElementById("teams-container");
-
-    // ======== STORAGE HELPERS ========
-    function savePlayersToLS(players) {
-      localStorage.setItem(LS_PLAYERS_KEY, JSON.stringify(players));
-    }
-
-    function loadPlayersFromLS() {
-      const data = localStorage.getItem(LS_PLAYERS_KEY);
-      if (!data) return null;
-      try {
-        return JSON.parse(data);
-      } catch (e) {
-        return null;
-      }
-    }
-
-    function saveTeamsToLS(teams) {
-      localStorage.setItem(LS_TEAMS_KEY, JSON.stringify(teams));
-    }
-
-    function loadTeamsFromLS() {
-      const data = localStorage.getItem(LS_TEAMS_KEY);
-      if (!data) return null;
-      try {
-        return JSON.parse(data);
-      } catch (e) {
-        return null;
-      }
-    }
-
-    // ======== RENDERIZAR TABLA ========
-    function renderTable(players) {
-      tbody.innerHTML = "";
-      players.forEach((p, i) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${i + 1}</td>
-          <td><input type="text" value="${p.name}" data-idx="${i}" data-field="name"></td>
-          <td><input type="number" value="${p.rating}" min="1" max="100" data-idx="${i}" data-field="rating"></td>
-          <td><input type="text" value="${p.pos}" data-idx="${i}" data-field="pos"></td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      // Cada input que cambie → guardar jugadores
-      tbody.querySelectorAll("input").forEach(input => {
-        input.addEventListener("input", handlePlayerInputChange);
-      });
-    }
-
-    function handlePlayerInputChange() {
-      const players = getPlayersFromTable();
-      savePlayersToLS(players);
-    }
-
-    function getPlayersFromTable() {
-      const rows = tbody.querySelectorAll("tr");
-      const players = [];
-      rows.forEach((row, idx) => {
-        const name = row.querySelector('input[data-field="name"]').value.trim() || `Jugador ${idx+1}`;
-        const rating = parseInt(row.querySelector('input[data-field="rating"]').value, 10) || 1;
-        const pos = row.querySelector('input[data-field="pos"]').value.trim() || "-";
-        players.push({ name, rating, pos });
-      });
-      return players;
-    }
-
-    // ======== LÓGICA DE EQUIPOS ========
-    function splitIntoTeams(players) {
-      const sorted = [...players].sort((a,b) => b.rating - a.rating);
-      const pattern = ["dark","light","light","dark","dark","light","light","dark","dark","light"];
-      const dark = [];
-      const light = [];
-      sorted.forEach((p, i) => {
-        if (pattern[i] === "dark") dark.push(p);
-        else light.push(p);
-      });
-      return { dark, light };
-    }
-
-    function renderTeams(teams) {
-      if (!teams || !teams.dark || !teams.light) {
-        teamsContainer.innerHTML = "<p>No hay equipos generados.</p>";
-        return;
-      }
-      teamsContainer.innerHTML = `
-        <div class="teams">
-          <div class="team dark">
-            <h3>Camiseta Oscura</h3>
-            ${teams.dark.map(p => `
-              <div class="card">
-                <span>${p.name} (${p.pos})</span>
-                <strong>${p.rating}</strong>
-              </div>
-            `).join("")}
-          </div>
-          <div class="team light">
-            <h3>Camiseta Clara</h3>
-            ${teams.light.map(p => `
-              <div class="card">
-                <span>${p.name} (${p.pos})</span>
-                <strong>${p.rating}</strong>
-              </div>
-            `).join("")}
-          </div>
-        </div>
-      `;
-    }
-
-    // ======== INICIALIZACIÓN ========
-    function init() {
-      // 1. Intentar cargar jugadores guardados
-      const storedPlayers = loadPlayersFromLS();
-      if (storedPlayers && Array.isArray(storedPlayers) && storedPlayers.length === 10) {
-        renderTable(storedPlayers);
-      } else {
-        // si no hay, usar los default
-        renderTable(defaultPlayers);
-        // y guardarlos para la próxima
-        savePlayersToLS(defaultPlayers);
-      }
-
-      // 2. Intentar cargar equipos guardados
-      const storedTeams = loadTeamsFromLS();
-      if (storedTeams) {
-        renderTeams(storedTeams);
-      }
-    }
-
-    init();
-
-    // ======== EVENTOS DE BOTONES ========
-    document.getElementById("generate-btn").addEventListener("click", () => {
-      const players = getPlayersFromTable();
-      if (players.length !== 10) {
-        alert("Tienen que ser exactamente 10 jugadores.");
-        return;
-      }
-      const teams = splitIntoTeams(players);
-      renderTeams(teams);
-      saveTeamsToLS(teams);
-      // también actualizamos la lista de jugadores (por si alguno estaba sin guardar)
-      savePlayersToLS(players);
-    });
-
-    document.getElementById("clear-storage").addEventListener("click", () => {
-      localStorage.removeItem(LS_PLAYERS_KEY);
-      localStorage.removeItem(LS_TEAMS_KEY);
-      renderTable(defaultPlayers);
-      renderTeams(null);
-    });
-  </script>
+  <script src="app.js" defer></script>
 </body>
 </html>
