@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Formar 2 equipos (5 vs 5)</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Arma equipos 5 vs 5 y guarda jugadores en localStorage." />
   <style>
     body {
       font-family: system-ui, sans-serif;
@@ -79,16 +80,21 @@
 
   <main class="wrapper">
     <section class="panel">
-      <h2>Jugadores (10)</h2>
+    <h2 id="players-heading">Jugadores (10)</h2>
       <table id="players-table">
         <thead>
-          <tr><th>#</th><th>Nombre</th><th>Puntaje</th><th>Pos.</th></tr>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Puntaje</th>
+            <th scope="col">Pos.</th>
+          </tr>
         </thead>
         <tbody></tbody>
       </table>
       <div>
-        <button id="generate-btn">Generar equipos</button>
-        <button id="clear-storage">Borrar todo lo guardado</button>
+        <button id="generate-btn" type="button">Generar equipos</button>
+        <button id="clear-storage" type="button">Borrar todo lo guardado</button>
       </div>
       <p style="font-size:.7rem;opacity:.7;margin-top:.5rem;">Los cambios en la tabla se guardan solos.</p>
     </section>
@@ -155,19 +161,53 @@
       tbody.innerHTML = "";
       players.forEach((p, i) => {
         const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${i + 1}</td>
-          <td><input type="text" value="${p.name}" data-idx="${i}" data-field="name"></td>
-          <td><input type="number" value="${p.rating}" min="1" max="100" data-idx="${i}" data-field="rating"></td>
-          <td><input type="text" value="${p.pos}" data-idx="${i}" data-field="pos"></td>
-        `;
+
+        const tdIndex = document.createElement("td");
+        tdIndex.textContent = i + 1;
+        tr.appendChild(tdIndex);
+
+        const tdName = document.createElement("td");
+        const inputName = document.createElement("input");
+        inputName.type = "text";
+        inputName.value = p.name;
+        inputName.setAttribute("data-idx", i);
+        inputName.setAttribute("data-field", "name");
+        inputName.setAttribute("aria-label", `Nombre jugador ${i + 1}`);
+        tdName.appendChild(inputName);
+        tr.appendChild(tdName);
+
+        const tdRating = document.createElement("td");
+        const inputRating = document.createElement("input");
+        inputRating.type = "number";
+        inputRating.min = 1;
+        inputRating.max = 100;
+        inputRating.value = p.rating;
+        inputRating.setAttribute("data-idx", i);
+        inputRating.setAttribute("data-field", "rating");
+        inputRating.setAttribute("aria-label", `Puntaje jugador ${i + 1}`);
+        tdRating.appendChild(inputRating);
+        tr.appendChild(tdRating);
+
+        const tdPos = document.createElement("td");
+        const inputPos = document.createElement("input");
+        inputPos.type = "text";
+        inputPos.value = p.pos;
+        inputPos.setAttribute("data-idx", i);
+        inputPos.setAttribute("data-field", "pos");
+        inputPos.setAttribute("aria-label", `Posición jugador ${i + 1}`);
+        tdPos.appendChild(inputPos);
+        tr.appendChild(tdPos);
+
         tbody.appendChild(tr);
+
+        // attach listeners directly
+        inputName.addEventListener("input", handlePlayerInputChange);
+        inputRating.addEventListener("input", handlePlayerInputChange);
+        inputPos.addEventListener("input", handlePlayerInputChange);
       });
 
-      // Cada input que cambie → guardar jugadores
-      tbody.querySelectorAll("input").forEach(input => {
-        input.addEventListener("input", handlePlayerInputChange);
-      });
+      const heading = document.getElementById("players-heading");
+      if (heading) heading.textContent = `Jugadores (${players.length})`;
     }
 
     function handlePlayerInputChange() {
@@ -201,32 +241,54 @@
     }
 
     function renderTeams(teams) {
+      teamsContainer.innerHTML = "";
       if (!teams || !teams.dark || !teams.light) {
-        teamsContainer.innerHTML = "<p>No hay equipos generados.</p>";
+        const p = document.createElement("p");
+        p.textContent = "No hay equipos generados.";
+        teamsContainer.appendChild(p);
         return;
       }
-      teamsContainer.innerHTML = `
-        <div class="teams">
-          <div class="team dark">
-            <h3>Camiseta Oscura</h3>
-            ${teams.dark.map(p => `
-              <div class="card">
-                <span>${p.name} (${p.pos})</span>
-                <strong>${p.rating}</strong>
-              </div>
-            `).join("")}
-          </div>
-          <div class="team light">
-            <h3>Camiseta Clara</h3>
-            ${teams.light.map(p => `
-              <div class="card">
-                <span>${p.name} (${p.pos})</span>
-                <strong>${p.rating}</strong>
-              </div>
-            `).join("")}
-          </div>
-        </div>
-      `;
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "teams";
+
+      const darkDiv = document.createElement("div");
+      darkDiv.className = "team dark";
+      const h3dark = document.createElement("h3");
+      h3dark.textContent = "Camiseta Oscura";
+      darkDiv.appendChild(h3dark);
+      teams.dark.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "card";
+        const span = document.createElement("span");
+        span.textContent = `${p.name} (${p.pos})`;
+        const strong = document.createElement("strong");
+        strong.textContent = p.rating;
+        card.appendChild(span);
+        card.appendChild(strong);
+        darkDiv.appendChild(card);
+      });
+
+      const lightDiv = document.createElement("div");
+      lightDiv.className = "team light";
+      const h3light = document.createElement("h3");
+      h3light.textContent = "Camiseta Clara";
+      lightDiv.appendChild(h3light);
+      teams.light.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "card";
+        const span = document.createElement("span");
+        span.textContent = `${p.name} (${p.pos})`;
+        const strong = document.createElement("strong");
+        strong.textContent = p.rating;
+        card.appendChild(span);
+        card.appendChild(strong);
+        lightDiv.appendChild(card);
+      });
+
+      wrapper.appendChild(darkDiv);
+      wrapper.appendChild(lightDiv);
+      teamsContainer.appendChild(wrapper);
     }
 
     // ======== INICIALIZACIÓN ========
